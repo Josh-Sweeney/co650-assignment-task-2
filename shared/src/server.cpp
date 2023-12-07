@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
     if (Comms::createSocket(serverSocket) != 0)
         return 0;
 
-    sockaddr_in service;
-    service.sin_family = AF_INET;
-    InetPton(AF_INET, _T("127.0.0.1"), &service.sin_addr.s_addr);
-    service.sin_port = htons(port);
+    sockaddr_in serverService;
+    if (Comms::createService(serverService) != 0)
+        return 0;
+
     if (bind(serverSocket, (SOCKADDR *)&service, sizeof(service)) == SOCKET_ERROR){
         cout << "bind() failed: " << WSAGetLastError() << endl;
         closesocket(serverSocket);

@@ -4,8 +4,10 @@
 #include <iostream>
 
 // TODO: Supposed to be abstract
-static class Comms {
-    public:
-       static int initializeWinsock();
-       static int createSocket(SOCKET& outSocket);
+class Comms
+{
+public:
+    static int initializeWinsock();
+    static int createSocket(SOCKET &outSocket);
+    static int Comms::createService(sockaddr_in& service);
 };

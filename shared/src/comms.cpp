@@ -1,9 +1,10 @@
 #include "comms.h"
 
+static int port = 55555;
+static char* localhostAddress = "127.0.0.1";
+
 // returns -1 on error, 0 on success
 int Comms::initializeWinsock() {
-    int port = 55555;
-
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(2, 2);
 
@@ -29,7 +30,7 @@ int Comms::createSocket(SOCKET& outSocket) {
     if (newSocket == INVALID_SOCKET) {
         std::cout << "Error creating Socket: " << std::endl;
         std::cout << WSAGetLastError() << std::endl;
-        
+
         WSACleanup();
         return -1;
     }
@@ -37,6 +38,16 @@ int Comms::createSocket(SOCKET& outSocket) {
     std::cout << "Created Socket" << std::endl;
 
     outSocket = newSocket;
+
+    return 0;
+}
+
+// returns -1 on error, 0 on success
+// modifies service
+int Comms::createService(sockaddr_in& service) {
+    service.sin_family = AF_INET;
+    InetPton(AF_INET, _T(localhostAddress), &service.sin_addr.s_addr);
+    service.sin_port = htons(port);
 
     return 0;
 }
