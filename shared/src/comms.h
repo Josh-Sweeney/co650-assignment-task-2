@@ -1,7 +1,9 @@
 #include <winsock2.h>
 
+#include <iostream>
+
 // TODO: Supposed to be abstract
-class Comms {
+static class Comms {
     public:
-        SOCKET createSocket();
+       static int initializeWinsock();
 };

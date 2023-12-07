@@ -3,9 +3,7 @@
 #include <tchar.h>
 #include <iostream>
 
-#include "data.h"
-
-using namespace std;
+#include "Comms.h"
 
 DWORD WINAPI AcceptThread(LPVOID param) {
     // param is the accept socket
@@ -63,19 +61,8 @@ int main(int argc, char *argv[])
     char servstr[NI_MAXSERV], hoststr[NI_MAXHOST];
 
     SOCKET serverSocket, acceptSocket;
-    int port = 55555;
-    WSADATA wsaData;
-    int wsaerr;
-    WORD wVersionRequested = MAKEWORD(2, 2);
-    wsaerr = WSAStartup(wVersionRequested, &wsaData);
-    if (wsaerr != 0){
-        cout << "The Winsock dll not found!" << endl;
-        return 0;
-    } 
-    else{
-        cout << "The Winsock dll found!" << endl;
-        cout << "The status: " << wsaData.szSystemStatus << endl;
-    }
+
+    Comms::initializeWinsock();
 
     serverSocket = INVALID_SOCKET;
     serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

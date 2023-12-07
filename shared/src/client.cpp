@@ -2,25 +2,13 @@
 #include <WS2tcpip.h>
 #include <tchar.h>
 #include <iostream>
-#include "data.h"
 
-using namespace std;
+#include "Comms.h"
 
 int main(int argc, char* argv[]) {
     SOCKET clientSocket;
-    int port = 55555;
-    WSAData wsaData;
-    int wsaerr;
-    WORD wVersionRequested = MAKEWORD(2, 2);
-    wsaerr = WSAStartup(wVersionRequested, &wsaData);
-    if (wsaerr != 0){
-        cout << "The Winsock dll not found!" << endl;
-        return 0;
-    }
-    else{
-        cout << "The Winsock dll found!" << endl;
-        cout << "The status: " << wsaData.szSystemStatus << endl;
-    }
+    
+    Comms::initializeWinsock();
 
     clientSocket = INVALID_SOCKET;
     clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
