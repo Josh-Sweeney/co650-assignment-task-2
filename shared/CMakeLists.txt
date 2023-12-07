@@ -6,4 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(Shared
     src/main.cpp
+    src/server.h
+    src/server.cpp
+    src/client.h
+    src/client.cpp
+    src/comms.h
+    src/comms.cpp
 )
+
+target_link_libraries(Shared PRIVATE ws2_32)
