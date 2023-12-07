@@ -2,7 +2,11 @@
 
 int main() {
     Server server;
-    server.initialize();
+    
+    if (server.initialize() != 0)
+        server.shutdown();
+
+    system("pause");
     
     return 0;
 }
