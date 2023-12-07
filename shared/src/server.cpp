@@ -1,79 +1,101 @@
 #include "server.h"
 #include "Comms.h"
 
-DWORD WINAPI AcceptThread(LPVOID param) {
-    // param is the accept socket
-    SOCKET acceptSocket = (SOCKET)param;
+DWORD WINAPI Server::acceptThread(LPVOID param)
+{
+    Server* instance = static_cast<Server*>(param);
 
-    // Exercise 1: Add code to the server to capture this transmitted message and display
-    // it on the screen.
+    SOCKADDR_STORAGE from;
+    int fromLength;
+    char serverString[NI_MAXSERV], hostString[NI_MAXHOST];
+
+    while (true)
+    {
+        instance->acceptSocket = accept(instance->serverSocket, (SOCKADDR *)&from, &fromLength);
+        if (instance->acceptSocket == INVALID_SOCKET)
+        {
+            std::cout << "Accept failed: " << std::endl;
+            std::cout << WSAGetLastError() << std::endl;
+
+            WSACleanup();
+            return -1;
+        }
+
+        fromLength = sizeof(from);
+
+        int getNameResult = getnameinfo((SOCKADDR *)&from, fromLength, hostString, NI_MAXHOST, serverString, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
+
+        if (getNameResult != 0)
+        {
+            std::cout << "Failed to get name info: " << std::endl;
+            std::cout << gai_strerror(getNameResult) << std::endl;
+
+            WSACleanup();
+            return -1;
+        }
+
+        std::cout << "Accepted connection from host '" << hostString << "' and port '" << serverString << "'" << std::endl;
+
+        CreateThread(NULL, 0, Server::receiveThread, (LPVOID)instance, 0, NULL);
+    }
+}
+
+DWORD WINAPI Server::receiveThread(LPVOID param)
+{
+    Server* instance = static_cast<Server*>(param);
+
     char receiveBuffer[200];
 
-    // Exercise 3: Extend exercise 2 by allowing an unlimited number of messages to be
-    // typed into the client and each one should receive a confirmation
-    while(true) {
-        int byteCount = recv(acceptSocket, receiveBuffer, 200, 0);
-        if (byteCount < 0) {
-            cout << "recv failed: " << WSAGetLastError() << endl;
-            return 0;
-        } else{
-            cout << "Received message: " << receiveBuffer << endl;
-
-            // Exercise 4: Extend the programs to terminate both the server and client machine
-            // if the user types "SHUTDOWN" into the client.
-            if (strstr("SHUTDOWN", receiveBuffer)) {
-                cout << "Shutting down server..." << endl;
-                break;
-            }
-
-            // Exercise 2: Now extend both the client and server so that that on receipt
-            // of a message the server sends an automatic confirmation message back to
-            // the client ("Message Received"), which is then displayed on the client's screen.
-            char sendBuffer[200] = "Message Received";
-            send(acceptSocket, sendBuffer, 200, 0);
+    while (true)
+    {
+        int byteCount = recv(instance->acceptSocket, receiveBuffer, 200, 0);
+        if (byteCount < 0)
+        {
+            std::cout << "recv failed: " << std::endl;
+            std::cout << WSAGetLastError() << std::endl;
+            return -1;
         }
+
+        std::cout << "Received message: " << receiveBuffer << std::endl;
+
+        if (strstr("SHUTDOWN", receiveBuffer))
+        {
+            instance->shutdown();
+            break;
+        }
+
+        char sendBuffer[200] = "Message Received";
+        send(instance->acceptSocket, sendBuffer, 200, 0);
     }
 }
 
-// Exercise 6: WIthin server create a new Thread Function, that declares a static instance
-// of Data and assigns it an initial health and name value. Then within a loop increments
-// the health by one and transmits the data object to the client every second
-DWORD WINAPI DataThread(LPVOID param) {
-    static Data data;
-    data.health = 100;
-    strcpy(data.name, "John");
-
-    while (true) {
-        send((SOCKET)param, (char*)&data, sizeof(Data), 0);
-        data.health++;
-        Sleep(1000);
-    }
-}
-
-
-int Server::bindSocket() {
-    if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR) {
+int Server::bindSocket()
+{
+    if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR)
+    {
         std::cout << "Binding failed: " << std::endl;
         std::cout << WSAGetLastError() << std::endl;
-        
+
         closesocket(this->serverSocket);
         WSACleanup();
         return -1;
     }
-    
+
     std::cout << "Binding was successful" << std::endl;
 
     return 0;
 }
 
-int Server::listenSocket() {
-    if (listen(this->serverSocket, 1) == SOCKET_ERROR) {
+int Server::listenSocket()
+{
+    if (listen(this->serverSocket, 1) == SOCKET_ERROR)
+    {
         std::cout << "Error listening on socket: " << std::endl;
         std::cout << WSAGetLastError() << std::endl;
 
         return -1;
-    } 
-    
+    }
+
     std::cout << "Server is now listening. Waiting for connections..." << std::endl;
 
     return 0;
@@ -81,63 +103,28 @@ int Server::listenSocket() {
 
 int Server::initialize()
 {
-    SOCKADDR_STORAGE from;
-    int retval, fromlen;
-    char servstr[NI_MAXSERV], hoststr[NI_MAXHOST];
-
-    SOCKET acceptSocket;
-
     if (Comms::initializeWinsock() != 0)
         return -1;
-    
+
     if (Comms::createSocket(this->serverSocket) != 0)
         return -1;
 
-    sockaddr_in serverService;
     if (Comms::createService(this->serverService) != 0)
         return -1;
 
     if (bindSocket() != 0)
-        return 0;
+        return -1;
 
     if (listenSocket() != 0)
-        return 0;
+        return -1;
 
-    fromlen = sizeof(from);
-
-    while (true) {
-        acceptSocket = accept(serverSocket, (SOCKADDR*)&from, &fromlen);
-        if (acceptSocket == INVALID_SOCKET){
-            cout << "accept failed: " << WSAGetLastError() << endl;
-            WSACleanup();
-            return -1;
-        }
-
-        retval = getnameinfo(
-            (SOCKADDR *)&from,
-            fromlen,
-            hoststr,
-            NI_MAXHOST,
-            servstr,
-            NI_MAXSERV,
-            NI_NUMERICHOST | NI_NUMERICSERV);
-
-        if (retval != 0) {
-            cout << "getnameinfo failed: " << retval << endl;
-            WSACleanup();
-            return -1;
-        }
-
-        cout << "Accepted connection from host " << hoststr << " and port " << servstr << endl;
-
-        // Exercise 6: Within main comment out the statement that was created in the previous
-        // exercises, and the thread, and add a new one that creates your new thread function
-        // CreateThread(NULL, 0, AcceptThread, (LPVOID)acceptSocket, 0, NULL);
-        CreateThread(NULL, 0, DataThread, (LPVOID)acceptSocket, 0, NULL);
-    }
-
-    system("pause");
-    WSACleanup();
+    CreateThread(NULL, 0, Server::acceptThread, (LPVOID)this, 0, NULL);
 
     return 0;
+}
+
+void Server::shutdown()
+{
+    closesocket(this->serverSocket);
+    WSACleanup();
 }
