@@ -51,12 +51,12 @@ DWORD WINAPI DataThread(LPVOID param) {
 }
 
 
-int Server::bindSocket(SOCKET& serverSocket, sockaddr_in& serverService) {
-    if (bind(serverSocket, (SOCKADDR *)&serverService, sizeof(serverService)) == SOCKET_ERROR) {
+int Server::bindSocket() {
+    if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR) {
         std::cout << "Binding failed: " << std::endl;
         std::cout << WSAGetLastError() << std::endl;
         
-        closesocket(serverSocket);
+        closesocket(this->serverSocket);
         WSACleanup();
         return -1;
     }
@@ -66,8 +66,8 @@ int Server::bindSocket(SOCKET& serverSocket, sockaddr_in& serverService) {
     return 0;
 }
 
-int Server::listenSocket(SOCKET& serverSocket) {
-    if (listen(serverSocket, 1) == SOCKET_ERROR) {
+int Server::listenSocket() {
+    if (listen(this->serverSocket, 1) == SOCKET_ERROR) {
         std::cout << "Error listening on socket: " << std::endl;
         std::cout << WSAGetLastError() << std::endl;
 
@@ -79,28 +79,28 @@ int Server::listenSocket(SOCKET& serverSocket) {
     return 0;
 }
 
-int main(int argc, char *argv[])
+int Server::initialize()
 {
     SOCKADDR_STORAGE from;
     int retval, fromlen;
     char servstr[NI_MAXSERV], hoststr[NI_MAXHOST];
 
-    SOCKET serverSocket, acceptSocket;
+    SOCKET acceptSocket;
 
     if (Comms::initializeWinsock() != 0)
-        return 0;
+        return -1;
     
-    if (Comms::createSocket(serverSocket) != 0)
-        return 0;
+    if (Comms::createSocket(this->serverSocket) != 0)
+        return -1;
 
     sockaddr_in serverService;
-    if (Comms::createService(serverService) != 0)
+    if (Comms::createService(this->serverService) != 0)
+        return -1;
+
+    if (bindSocket() != 0)
         return 0;
 
-    if (bindSocket(serverSocket, serverService) != 0)
-        return 0;
-
-    if (listenSocket(serverSocket) != 0)
+    if (listenSocket() != 0)
         return 0;
 
     fromlen = sizeof(from);

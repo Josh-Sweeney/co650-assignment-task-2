@@ -4,8 +4,9 @@ project(Server)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Server
+add_executable(Server 
     src/main.cpp
 )
 
-target_link_libraries(Server PRIVATE ws2_32)
+target_link_libraries(Server PRIVATE ws2_32 PRIVATE Shared)
+target_include_directories(Server PRIVATE ../shared/src)

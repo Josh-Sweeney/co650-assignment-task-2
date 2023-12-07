@@ -4,7 +4,7 @@ project(Shared)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Shared
+add_library(Shared
     src/main.cpp
     src/server.h
     src/server.cpp

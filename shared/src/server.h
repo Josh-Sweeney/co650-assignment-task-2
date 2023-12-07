@@ -4,7 +4,13 @@
 #include <iostream>
 
 class Server {
+    private:
+        SOCKET serverSocket;
+        sockaddr_in serverService;
+
+        int bindSocket();
+        int Server::listenSocket();
+
     public:
-        int bindSocket(SOCKET& serverSocket, sockaddr_in& serverService);
-        int Server::listenSocket(SOCKET& serverSocket);
+        int initialize();
 };

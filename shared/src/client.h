@@ -5,6 +5,12 @@
 
 class Client
 {
+private:
+    SOCKET clientSocket;
+    sockaddr_in clientService;
+
+    int connectSocket();
+
 public:
-    int Client::connectSocket(SOCKET &clientSocket, sockaddr_in &clientService);
+    int initialize();
 };

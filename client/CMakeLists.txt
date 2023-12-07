@@ -8,4 +8,5 @@ add_executable(Client
     src/main.cpp
 )
 
-target_link_libraries(Client PRIVATE ws2_32)
+target_link_libraries(Client PRIVATE ws2_32 PRIVATE Shared)
+target_include_directories(Client PRIVATE ../shared/src)
