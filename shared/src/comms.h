@@ -1,3 +1,5 @@
+#pragma once
+
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <tchar.h>
@@ -9,5 +11,5 @@ class Comms
 public:
     static int initializeWinsock();
     static int createSocket(SOCKET &outSocket);
-    static int Comms::createService(sockaddr_in& service);
+    static int createService(sockaddr_in& service);
 };
