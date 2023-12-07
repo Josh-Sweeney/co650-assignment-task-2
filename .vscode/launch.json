@@ -5,11 +5,23 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) Launch",
+            "name": "Server",
             "type": "cppvsdbg",
             "request": "launch",
             "preLaunchTask": "CMake: build",
             "program": "${workspaceFolder}/build/server/Debug/server.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Client",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "preLaunchTask": "CMake: build",
+            "program": "${workspaceFolder}/build/client/Debug/client.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

@@ -2,7 +2,11 @@
 
 int main() {
     Client client;
-    client.initialize();
     
+    if (client.initialize() != 0)
+        client.shutdown();
+    
+    system("pause");
+
     return 0;
 }
