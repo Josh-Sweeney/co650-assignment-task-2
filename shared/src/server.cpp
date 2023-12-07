@@ -66,6 +66,19 @@ int Server::bindSocket(SOCKET& serverSocket, sockaddr_in& serverService) {
     return 0;
 }
 
+int Server::listenSocket(SOCKET& serverSocket) {
+    if (listen(serverSocket, 1) == SOCKET_ERROR) {
+        std::cout << "Error listening on socket: " << std::endl;
+        std::cout << WSAGetLastError() << std::endl;
+
+        return -1;
+    } 
+    
+    std::cout << "Server is now listening. Waiting for connections..." << std::endl;
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     SOCKADDR_STORAGE from;
@@ -87,10 +100,8 @@ int main(int argc, char *argv[])
     if (bindSocket(serverSocket, serverService) != 0)
         return 0;
 
-    if (listen(serverSocket, 1) == SOCKET_ERROR)
-        cout << "listen(): Error listening on socket " << WSAGetLastError() << endl;
-    else
-        cout << "listen() is OK, I'm waiting for connections..." << endl;
+    if (listenSocket(serverSocket) != 0)
+        return 0;
 
     fromlen = sizeof(from);
 

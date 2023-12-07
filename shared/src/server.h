@@ -6,4 +6,5 @@
 class Server {
     public:
         int bindSocket(SOCKET& serverSocket, sockaddr_in& serverService);
+        int Server::listenSocket(SOCKET& serverSocket);
 };

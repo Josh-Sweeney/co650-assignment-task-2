@@ -1,9 +1,19 @@
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-#include <tchar.h>
-#include <iostream>
+#include "client.h"
+#include "comms.h"
 
-#include "Comms.h"
+int Client::connectSocket(SOCKET& clientSocket, sockaddr_in& clientService) {
+    if (connect(clientSocket, (SOCKADDR*)&clientService, sizeof(clientService)) == SOCKET_ERROR){
+        std::cout << "Failed to connect to socket: " << std::endl;
+
+        WSACleanup();
+        return -1;
+    }
+
+    std::cout << "Connected to socket." << std::endl;
+    std::cout << "Client: Can start sending and receiving data..." << std::endl;
+
+    return 0;
+}
 
 int main(int argc, char* argv[]) {
     SOCKET clientSocket;
@@ -18,15 +28,8 @@ int main(int argc, char* argv[]) {
     if (Comms::createService(clientService) != 0)
         return 0;
 
-    if (connect(clientSocket, (SOCKADDR*)&clientService, sizeof(clientService)) == SOCKET_ERROR){
-        cout << "Client: connect() - Failed to connect. " << endl;
-        WSACleanup();
+    if (connectSocket(clientSocket, clientService) != 0)
         return 0;
-    }
-    else{
-        cout << "Client: connect() is OK." << endl;
-        cout << "Client: Can start sending and receiving data..." << endl;
-    }
 
     // Exercise 1: Within the client add the code to allow the user to type in a message.
     char buffer[200];
