@@ -1,8 +1,4 @@
-#include <WinSock2.h>
-#include <WS2tcpip.h>
-#include <tchar.h>
-#include <iostream>
-
+#include "server.h"
 #include "Comms.h"
 
 DWORD WINAPI AcceptThread(LPVOID param) {
@@ -54,6 +50,22 @@ DWORD WINAPI DataThread(LPVOID param) {
     }
 }
 
+
+int Server::bindSocket(SOCKET& serverSocket, sockaddr_in& serverService) {
+    if (bind(serverSocket, (SOCKADDR *)&serverService, sizeof(serverService)) == SOCKET_ERROR) {
+        std::cout << "Binding failed: " << std::endl;
+        std::cout << WSAGetLastError() << std::endl;
+        
+        closesocket(serverSocket);
+        WSACleanup();
+        return -1;
+    }
+    
+    std::cout << "Binding was successful" << std::endl;
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     SOCKADDR_STORAGE from;
@@ -72,15 +84,8 @@ int main(int argc, char *argv[])
     if (Comms::createService(serverService) != 0)
         return 0;
 
-    if (bind(serverSocket, (SOCKADDR *)&service, sizeof(service)) == SOCKET_ERROR){
-        cout << "bind() failed: " << WSAGetLastError() << endl;
-        closesocket(serverSocket);
-        WSACleanup();
+    if (bindSocket(serverSocket, serverService) != 0)
         return 0;
-    }
-    else{
-        cout << "bind() is OK!" << endl;
-    }
 
     if (listen(serverSocket, 1) == SOCKET_ERROR)
         cout << "listen(): Error listening on socket " << WSAGetLastError() << endl;
