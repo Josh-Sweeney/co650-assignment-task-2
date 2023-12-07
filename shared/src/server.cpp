@@ -62,18 +62,11 @@ int main(int argc, char *argv[])
 
     SOCKET serverSocket, acceptSocket;
 
-    Comms::initializeWinsock();
-
-    serverSocket = INVALID_SOCKET;
-    serverSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (serverSocket == INVALID_SOCKET){
-        cout << "Error at socket(): " << WSAGetLastError() << endl;
-        WSACleanup();
+    if (Comms::initializeWinsock() != 0)
         return 0;
-    }
-    else{
-        cout << "socket() is OK!" << endl;
-    }
+    
+    if (Comms::createSocket(serverSocket) != 0)
+        return 0;
 
     sockaddr_in service;
     service.sin_family = AF_INET;

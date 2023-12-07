@@ -8,18 +8,11 @@
 int main(int argc, char* argv[]) {
     SOCKET clientSocket;
     
-    Comms::initializeWinsock();
-
-    clientSocket = INVALID_SOCKET;
-    clientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (clientSocket == INVALID_SOCKET){
-        cout << "Error at socket(): " << WSAGetLastError() << endl;
-        WSACleanup();
+    if (Comms::initializeWinsock() != 0)
         return 0;
-    }
-    else{
-        cout << "socket() is OK!" << endl;
-    }
+    
+    if (Comms::createSocket(clientSocket) != 0)
+        return 0;
 
     sockaddr_in clientService;
     clientService.sin_family = AF_INET;
