@@ -1,5 +1,0 @@
-C:/Users/Josh Sweeney/college-github/co650-exercises-week-12-tcp/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Josh Sweeney/college-github/co650-exercises-week-12-tcp/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/Josh Sweeney/college-github/co650-exercises-week-12-tcp/build/server/CMakeFiles/Server.dir
-C:/Users/Josh Sweeney/college-github/co650-exercises-week-12-tcp/build/client/CMakeFiles/Client.dir
-C:/Users/Josh Sweeney/college-github/co650-exercises-week-12-tcp/build/client/CMakeFiles/ALL_BUILD.dir
