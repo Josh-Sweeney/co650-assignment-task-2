@@ -1,3 +1,5 @@
+#if COMPILE_CLIENT == 1
+
 #include "client.h"
 #include "comms.h"
 
@@ -86,3 +88,5 @@ void Client::shutdown()
     closesocket(this->clientSocket);
     WSACleanup();
 }
+
+#endif

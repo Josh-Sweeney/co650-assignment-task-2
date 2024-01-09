@@ -1,9 +1,11 @@
+#if COMPILE_SERVER == 1
+
 #include "server.h"
 #include "Comms.h"
 
 DWORD WINAPI Server::acceptThread(LPVOID param)
 {
-    Server* instance = static_cast<Server*>(param);
+    Server *instance = static_cast<Server *>(param);
 
     SOCKADDR_STORAGE from;
     int fromLength;
@@ -42,7 +44,7 @@ DWORD WINAPI Server::acceptThread(LPVOID param)
 
 DWORD WINAPI Server::receiveThread(LPVOID param)
 {
-    Server* instance = static_cast<Server*>(param);
+    Server *instance = static_cast<Server *>(param);
 
     char receiveBuffer[200];
 
@@ -129,3 +131,5 @@ void Server::shutdown()
     closesocket(this->serverSocket);
     WSACleanup();
 }
+
+#endif
