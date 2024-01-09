@@ -1,7 +1,7 @@
 #include "server.h"
 
 int main() {
-    Server server;
+    Server server{};
     
     if (server.initialize() != 0)
         server.shutdown();

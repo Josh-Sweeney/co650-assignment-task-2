@@ -1,4 +1,4 @@
-#if COMPILE_CLIENT == 1
+#ifdef COMPILE_CLIENT
 
 #include "client.h"
 #include "comms.h"

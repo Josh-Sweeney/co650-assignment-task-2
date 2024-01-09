@@ -1,4 +1,4 @@
-#if COMPILE_SERVER == 1
+#ifdef COMPILE_SERVER
 
 #include "server.h"
 #include "Comms.h"

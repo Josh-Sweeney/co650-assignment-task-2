@@ -1,7 +1,7 @@
 #include "client.h"
 
 int main() {
-    Client client;
+    Client client{};
     
     if (client.initialize() != 0)
         client.shutdown();

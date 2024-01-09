@@ -1,7 +1,7 @@
 #include "comms.h"
 
 static int port = 55555;
-static char* localhostAddress = "127.0.0.1";
+static const char* localhostAddress = _T("127.0.0.1");
 
 // returns -1 on error, 0 on success
 int Comms::initializeWinsock() {
@@ -46,7 +46,7 @@ int Comms::createSocket(SOCKET& outSocket) {
 // modifies service
 int Comms::createService(sockaddr_in& service) {
     service.sin_family = AF_INET;
-    InetPton(AF_INET, _T(localhostAddress), &service.sin_addr.s_addr);
+    InetPton(AF_INET, localhostAddress, &service.sin_addr.s_addr);
     service.sin_port = htons(port);
 
     return 0;
