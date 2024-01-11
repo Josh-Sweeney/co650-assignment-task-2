@@ -11,75 +11,69 @@ DWORD WINAPI Client::sendThread(LPVOID param)
 
     while (true)
     {
-        printf("Type a message to send to server:\n");
-        std::cin.getline(buffer, 200);
-        int byteCount = send(instance->clientSocket, buffer, 200, 0);
-
-        if (strstr("SHUTDOWN", buffer))
+        try
         {
-            std::cout << "Client: Shutting down client..." << std::endl;
-            break;
+            printf("Type a message to send to server:\n");
+            std::cin.getline(buffer, 200);
+            int byteCount = send(instance->clientSocket, buffer, 200, 0);
+
+            if (strstr("SHUTDOWN", buffer))
+            {
+                std::cout << "Client: Shutting down client..." << std::endl;
+                break;
+            }
+
+            if (byteCount == SOCKET_ERROR)
+            {
+                throw std::runtime_error("Client: send() error " + WSAGetLastError());
+            }
+
+            std::cout << "Client: send() is OK." << std::endl;
+
+            char responseBuffer[200];
+
+            byteCount = recv(instance->clientSocket, (char *)&buffer, sizeof(buffer), 0);
+            if (byteCount < 0)
+            {
+                throw std::runtime_error("Client: recv() error " + WSAGetLastError());
+            }
+
+            std::cout << "Server responded with message: " << responseBuffer << std::endl;
         }
-
-        if (byteCount == SOCKET_ERROR)
+        catch (const std::exception &e)
         {
-            std::cout << "Client: send() error " << WSAGetLastError() << std::endl;
+            std::cout << e.what() << std::endl;
             instance->shutdown();
-
-            return -1;
         }
-
-        std::cout << "Client: send() is OK." << std::endl;
-
-        char responseBuffer[200];
-
-        byteCount = recv(instance->clientSocket, (char *)&buffer, sizeof(buffer), 0);
-        if (byteCount < 0)
-        {
-            std::cout << "Client: recv() failed: " << std::endl;
-            std::cout << WSAGetLastError() << std::endl;
-
-            instance->shutdown();
-            return -1;
-        }
-
-        std::cout << "Server responded with message: " << responseBuffer << std::endl;
     }
 }
 
-int Client::connectSocket()
+void Client::connectSocket()
 {
-    if (connect(this->clientSocket, (SOCKADDR *)&this->clientService, sizeof(this->clientService)) == SOCKET_ERROR)
+    try
     {
-        std::cout << "Failed to connect to socket: " << std::endl;
+        if (connect(this->clientSocket, (SOCKADDR *)&this->clientService, sizeof(this->clientService)) == SOCKET_ERROR)
+        {
+            throw std::runtime_error("Client: connect() error " + WSAGetLastError());
+        }
 
-        WSACleanup();
-        return -1;
+        std::cout << "Connected to socket." << std::endl;
+        std::cout << "Client: Can start sending and receiving data..." << std::endl;
     }
-
-    std::cout << "Connected to socket." << std::endl;
-    std::cout << "Client: Can start sending and receiving data..." << std::endl;
-
-    return 0;
+    catch (const std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        this->shutdown();
+    }
 }
 
-int Client::initialize()
+void Client::initialize()
 {
-    if (Comms::initializeWinsock() != 0)
-        return -1;
-
-    if (Comms::createSocket(this->clientSocket) != 0)
-        return -1;
-
-    if (Comms::createService(this->clientService) != 0)
-        return -1;
-
-    if (connectSocket() != 0)
-        return -1;
-
+    Comms::initializeWinsock();
+    Comms::createSocket(this->clientSocket);
+    Comms::createService(this->clientService);
+    connectSocket();
     CreateThread(NULL, 0, sendThread, this, 0, NULL);
-
-    return 0;
 }
 
 void Client::shutdown()

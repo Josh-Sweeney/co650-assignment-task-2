@@ -15,30 +15,30 @@ DWORD WINAPI Server::acceptThread(LPVOID param)
 
     while (true)
     {
-        instance->acceptSocket = accept(instance->serverSocket, (SOCKADDR *)&from, &fromLength);
-        if (instance->acceptSocket == INVALID_SOCKET)
+        try
         {
-            std::cout << "Server: Accept failed: " << std::endl;
-            std::cout << WSAGetLastError() << std::endl;
+            instance->acceptSocket = accept(instance->serverSocket, (SOCKADDR *)&from, &fromLength);
+            if (instance->acceptSocket == INVALID_SOCKET)
+            {
+                throw std::runtime_error("Server: Accept failed: " + WSAGetLastError());
+            }
 
-            WSACleanup();
-            return -1;
+            int getNameResult = getnameinfo((SOCKADDR *)&from, fromLength, hostString, NI_MAXHOST, serverString, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
+
+            if (getNameResult != 0)
+            {
+                throw std::runtime_error("Server: Failed to get name info: " + std::string(gai_strerror(getNameResult)));
+            }
+
+            std::cout << "Server: Accepted connection from host '" << hostString << "' and port '" << serverString << "'" << std::endl;
+
+            CreateThread(NULL, 0, Server::receiveThread, (LPVOID)instance, 0, NULL);
         }
-
-        int getNameResult = getnameinfo((SOCKADDR *)&from, fromLength, hostString, NI_MAXHOST, serverString, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-
-        if (getNameResult != 0)
+        catch (const std::exception &e)
         {
-            std::cout << "Server: Failed to get name info: " << std::endl;
-            std::cout << gai_strerror(getNameResult) << std::endl;
-
-            WSACleanup();
-            return -1;
+            std::cout << e.what() << std::endl;
+            instance->shutdown();
         }
-
-        std::cout << "Server: Accepted connection from host '" << hostString << "' and port '" << serverString << "'" << std::endl;
-
-        CreateThread(NULL, 0, Server::receiveThread, (LPVOID)instance, 0, NULL);
     }
 }
 
@@ -50,79 +50,80 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
 
     while (true)
     {
-        int byteCount = recv(instance->acceptSocket, receiveBuffer, 200, 0);
-        if (byteCount < 0)
+        try
         {
-            std::cout << "recv failed: " << std::endl;
-            std::cout << WSAGetLastError() << std::endl;
-            return -1;
+            int byteCount = recv(instance->acceptSocket, receiveBuffer, 200, 0);
+            if (byteCount < 0)
+            {
+                throw std::runtime_error("Server: recv() error " + WSAGetLastError());
+            }
+
+            std::cout << "Server: Received message: " << receiveBuffer << std::endl;
+
+            if (strstr("SHUTDOWN", receiveBuffer))
+            {
+                instance->shutdown();
+                break;
+            }
+
+            char sendBuffer[200] = "Message Received";
+            send(instance->acceptSocket, sendBuffer, 200, 0);
         }
-
-        std::cout << "Server: Received message: " << receiveBuffer << std::endl;
-
-        if (strstr("SHUTDOWN", receiveBuffer))
+        catch (const std::exception &e)
         {
+            std::cout << e.what() << std::endl;
             instance->shutdown();
-            break;
         }
-
-        char sendBuffer[200] = "Message Received";
-        send(instance->acceptSocket, sendBuffer, 200, 0);
     }
 }
 
-int Server::bindSocket()
+void Server::bindSocket()
 {
-    if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR)
+    try
     {
-        std::cout << "Server: Binding failed: " << std::endl;
-        std::cout << WSAGetLastError() << std::endl;
+        if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR)
+        {
+            throw std::runtime_error("Server: Binding failed: " + WSAGetLastError());
+        }
 
+        std::cout << "Server: Binding was successful" << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
         closesocket(this->serverSocket);
         WSACleanup();
-        return -1;
     }
-
-    std::cout << "Server: Binding was successful" << std::endl;
-
-    return 0;
 }
 
-int Server::listenSocket()
+void Server::listenSocket()
 {
-    if (listen(this->serverSocket, 1) == SOCKET_ERROR)
+    try
     {
-        std::cout << "Server: Error listening on socket: " << std::endl;
-        std::cout << WSAGetLastError() << std::endl;
+        if (listen(this->serverSocket, 1) == SOCKET_ERROR)
+        {
+            throw std::runtime_error("Server: Listening failed: " + WSAGetLastError());
+        }
 
-        return -1;
+        std::cout << "Server: Now listening. Waiting for connections..." << std::endl;
     }
-
-    std::cout << "Server: Now listening. Waiting for connections..." << std::endl;
-
-    return 0;
+    catch (const std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        closesocket(this->serverSocket);
+        WSACleanup();
+    }
 }
 
-int Server::initialize()
+void Server::initialize()
 {
-    if (Comms::initializeWinsock() != 0)
-        return -1;
-
-    if (Comms::createSocket(this->serverSocket) != 0)
-        return -1;
-
-    if (Comms::createService(this->serverService) != 0)
-        return -1;
-
-    if (bindSocket() != 0)
-        return -1;
-
-    if (listenSocket() != 0)
-        return -1;
+    Comms::initializeWinsock();
+    Comms::createSocket(this->serverSocket);
+    Comms::createService(this->serverService);
+    bindSocket();
+    listenSocket();
 
     CreateThread(NULL, 0, Server::acceptThread, (LPVOID)this, 0, NULL);
-
-    return 0;
 }
 
 void Server::shutdown()

@@ -13,9 +13,9 @@ private:
 
     static DWORD WINAPI sendThread(LPVOID param);
 
-    int connectSocket();
+    void connectSocket();
 
 public:
-    int initialize();
+    void initialize();
     void shutdown();
 };

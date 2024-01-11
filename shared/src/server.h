@@ -15,10 +15,10 @@ class Server {
         static DWORD WINAPI acceptThread(LPVOID param);
         static DWORD WINAPI receiveThread(LPVOID param);
 
-        int bindSocket();
-        int Server::listenSocket();
+        void bindSocket();
+        void Server::listenSocket();
 
     public:
-        int initialize();
+        void initialize();
         void shutdown();
 };
