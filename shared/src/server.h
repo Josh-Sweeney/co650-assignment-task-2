@@ -15,8 +15,8 @@ class Server {
         static DWORD WINAPI acceptThread(LPVOID param);
         static DWORD WINAPI receiveThread(LPVOID param);
 
-        int bindSocket();
-        int listenSocket();
+        void bindSocket();
+        void listenSocket();
 
     public:
         void initialize();
