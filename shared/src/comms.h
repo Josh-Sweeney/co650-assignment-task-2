@@ -5,11 +5,11 @@
 #include <tchar.h>
 #include <iostream>
 
-// TODO: Supposed to be abstract
+// Abstract class
 class Comms
 {
 public:
-    static int initializeWinsock();
-    static int createSocket(SOCKET &outSocket);
-    static int createService(sockaddr_in& service);
+    static void initializeWinsock();
+    static void createSocket(SOCKET &outSocket);
+    static void createService(sockaddr_in& service);
 };

@@ -1,12 +1,20 @@
 #include "server.h"
 
-int main() {
+int main()
+{
     Server server{};
-    
-    if (server.initialize() != 0)
+
+    try
+    {
+        server.initialize();
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << e.what() << std::endl;
         server.shutdown();
+    }
 
     system("pause");
-    
+
     return 0;
 }

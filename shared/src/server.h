@@ -19,6 +19,6 @@ class Server {
         int listenSocket();
 
     public:
-        int initialize();
+        void initialize();
         void shutdown();
 };
