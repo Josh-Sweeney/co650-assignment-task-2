@@ -12,6 +12,7 @@ int main()
     {
         std::cout << e.what() << std::endl;
         server.shutdown();
+        return -1;
     }
 
     system("pause");

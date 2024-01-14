@@ -49,8 +49,6 @@ DWORD WINAPI Client::sendThread(LPVOID param)
 }
 
 void Client::connectSocket()
-{
-    try
     {
         if (connect(this->clientSocket, (SOCKADDR *)&this->clientService, sizeof(this->clientService)) == SOCKET_ERROR)
         {
@@ -59,12 +57,6 @@ void Client::connectSocket()
 
         std::cout << "Connected to socket." << std::endl;
         std::cout << "Client: Can start sending and receiving data..." << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cout << e.what() << std::endl;
-        this->shutdown();
-    }
 }
 
 void Client::initialize()

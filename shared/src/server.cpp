@@ -78,8 +78,6 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
 }
 
 void Server::bindSocket()
-{
-    try
     {
         if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR)
         {
@@ -87,18 +85,9 @@ void Server::bindSocket()
         }
 
         std::cout << "Server: Binding was successful" << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cout << e.what() << std::endl;
-        closesocket(this->serverSocket);
-        WSACleanup();
-    }
 }
 
 void Server::listenSocket()
-{
-    try
     {
         if (listen(this->serverSocket, 1) == SOCKET_ERROR)
         {
@@ -106,13 +95,6 @@ void Server::listenSocket()
         }
 
         std::cout << "Server: Now listening. Waiting for connections..." << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cout << e.what() << std::endl;
-        closesocket(this->serverSocket);
-        WSACleanup();
-    }
 }
 
 void Server::initialize()
