@@ -6,19 +6,20 @@
 #include <iostream>
 #include <windows.h>
 
-class Server {
-    private:
-        SOCKET serverSocket;
-        SOCKET acceptSocket;
-        sockaddr_in serverService;
+class Server
+{
+private:
+    SOCKET serverSocket;
+    SOCKET acceptSocket;
+    sockaddr_in serverService;
 
-        static DWORD WINAPI acceptThread(LPVOID param);
-        static DWORD WINAPI receiveThread(LPVOID param);
+    static DWORD WINAPI acceptThread(LPVOID param);
+    static DWORD WINAPI receiveThread(LPVOID param);
 
-        void bindSocket();
-        void listenSocket();
+    void bindSocket();
+    void listenSocket();
 
-    public:
-        void initialize();
-        void shutdown();
+public:
+    void initialize();
+    void shutdown();
 };

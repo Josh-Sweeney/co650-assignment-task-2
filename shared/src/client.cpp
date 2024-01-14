@@ -49,14 +49,14 @@ DWORD WINAPI Client::sendThread(LPVOID param)
 }
 
 void Client::connectSocket()
+{
+    if (connect(this->clientSocket, (SOCKADDR *)&this->clientService, sizeof(this->clientService)) == SOCKET_ERROR)
     {
-        if (connect(this->clientSocket, (SOCKADDR *)&this->clientService, sizeof(this->clientService)) == SOCKET_ERROR)
-        {
-            throw std::runtime_error("Client: connect() error " + WSAGetLastError());
-        }
+        throw std::runtime_error("Client: connect() error " + WSAGetLastError());
+    }
 
-        std::cout << "Connected to socket." << std::endl;
-        std::cout << "Client: Can start sending and receiving data..." << std::endl;
+    std::cout << "Connected to socket." << std::endl;
+    std::cout << "Client: Can start sending and receiving data..." << std::endl;
 }
 
 void Client::initialize()

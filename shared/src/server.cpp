@@ -1,5 +1,4 @@
 #ifdef COMPILE_SERVER
-
 #include "server.h"
 #include "Comms.h"
 
@@ -78,23 +77,23 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
 }
 
 void Server::bindSocket()
+{
+    if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR)
     {
-        if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR)
-        {
-            throw std::runtime_error("Server: Binding failed: " + WSAGetLastError());
-        }
+        throw std::runtime_error("Server: Binding failed: " + WSAGetLastError());
+    }
 
-        std::cout << "Server: Binding was successful" << std::endl;
+    std::cout << "Server: Binding was successful" << std::endl;
 }
 
 void Server::listenSocket()
+{
+    if (listen(this->serverSocket, 1) == SOCKET_ERROR)
     {
-        if (listen(this->serverSocket, 1) == SOCKET_ERROR)
-        {
-            throw std::runtime_error("Server: Listening failed: " + WSAGetLastError());
-        }
+        throw std::runtime_error("Server: Listening failed: " + WSAGetLastError());
+    }
 
-        std::cout << "Server: Now listening. Waiting for connections..." << std::endl;
+    std::cout << "Server: Now listening. Waiting for connections..." << std::endl;
 }
 
 void Server::initialize()
