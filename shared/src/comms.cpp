@@ -27,7 +27,8 @@ void Comms::createSocket(SOCKET &outSocket)
 
     if (newSocket == INVALID_SOCKET)
     {
-        throw std::runtime_error("Error creating Socket: " + WSAGetLastError());
+        std::string errorMessage = "Error creating Socket: " + std::to_string(WSAGetLastError());
+        throw std::runtime_error(errorMessage);
     }
 
     std::cout << "Created Socket" << std::endl;
