@@ -6,6 +6,7 @@ int main()
 
     try
     {
+        // Server::run() starts a thread and waits for it to finish.
         server.run();
     }
     catch (const std::exception &e)
