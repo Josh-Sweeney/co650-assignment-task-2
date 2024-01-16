@@ -32,7 +32,7 @@ DWORD WINAPI Client::sendThread(LPVOID param)
 
             char responseBuffer[200];
 
-            byteCount = recv(instance->clientSocket, (char *)&buffer, sizeof(buffer), 0);
+            byteCount = recv(instance->clientSocket, responseBuffer, sizeof(responseBuffer), 0);
             if (byteCount < 0)
             {
                 throw std::runtime_error("Client: recv() error " + WSAGetLastError());
