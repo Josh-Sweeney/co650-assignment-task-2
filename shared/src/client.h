@@ -4,6 +4,7 @@
 #include <WS2tcpip.h>
 #include <tchar.h>
 #include <iostream>
+#include <string>
 
 class Client
 {
