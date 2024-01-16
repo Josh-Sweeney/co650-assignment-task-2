@@ -52,6 +52,7 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
     Server *instance = static_cast<Server *>(param);
 
     char receiveBuffer[200];
+    char sendBuffer[200];
 
     while (true)
     {
@@ -70,12 +71,24 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
             }
 
             std::cout << "Server: Received message: " << receiveBuffer << std::endl;
-
+            
             if (strstr("QUIT", receiveBuffer))
             {
                 instance->shutdown();
                 break;
             }
+
+            printf("Type a message to send to Client:\n");
+            std::cin.getline(sendBuffer, 200);
+            byteCount = send(instance->acceptSocket, sendBuffer, 200, 0);
+
+            if (byteCount == SOCKET_ERROR)
+            {
+                std::string errorMessage = "Server: send() error " + std::to_string(WSAGetLastError());
+                throw std::runtime_error(errorMessage);
+            }
+
+            std::cout << "Server: send() is OK." << std::endl;
 
             char sendBuffer[200] = "Message Received";
             send(instance->acceptSocket, sendBuffer, 200, 0);
