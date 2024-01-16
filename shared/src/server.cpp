@@ -144,7 +144,7 @@ void Server::shutdown()
 {
     if (!this->shutdownRequested)
     {
-        std::cout << "Server: Shutting down...";
+        std::cout << "Server: Shutting down..." << std::endl;
     }
 
     this->shutdownRequested = true;
