@@ -16,6 +16,11 @@ DWORD WINAPI Server::acceptThread(LPVOID param)
     {
         try
         {
+            if (instance->shutdownRequested)
+            {
+                break;
+            }
+
             instance->acceptSocket = accept(instance->serverSocket, (SOCKADDR *)&from, &fromLength);
             if (instance->acceptSocket == INVALID_SOCKET)
             {
@@ -51,6 +56,11 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
     {
         try
         {
+            if (instance->shutdownRequested)
+            {
+                break;
+            }
+
             int byteCount = recv(instance->acceptSocket, receiveBuffer, 200, 0);
             if (byteCount < 0)
             {
@@ -115,7 +125,12 @@ void Server::run()
 
 void Server::shutdown()
 {
-    std::cout << "Server: Shutting down...";
+    if (!this->shutdownRequested)
+    {
+        std::cout << "Server: Shutting down...";
+    }
+
+    this->shutdownRequested = true;
     closesocket(this->serverSocket);
     WSACleanup();
 }

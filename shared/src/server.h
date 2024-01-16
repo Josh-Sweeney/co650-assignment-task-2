@@ -13,6 +13,8 @@ private:
     SOCKET acceptSocket;
     sockaddr_in serverService;
 
+    bool shutdownRequested = false;
+
     static DWORD WINAPI acceptThread(LPVOID param);
     static DWORD WINAPI receiveThread(LPVOID param);
 
