@@ -6,7 +6,7 @@ int main()
 
     try
     {
-        server.initialize();
+        server.run();
     }
     catch (const std::exception &e)
     {

@@ -6,7 +6,8 @@ int main()
 
     try
     {
-        client.initialize();
+        // Client::run() starts a thread and waits for it to finish.
+        client.run();
     }
     catch (const std::exception &e)
     {

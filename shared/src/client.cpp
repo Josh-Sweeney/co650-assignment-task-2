@@ -59,13 +59,19 @@ void Client::connectSocket()
     std::cout << "Client: Can start sending and receiving data..." << std::endl;
 }
 
-void Client::initialize()
+void Client::run()
 {
     Comms::initializeWinsock();
     Comms::createSocket(this->clientSocket);
     Comms::createService(this->clientService);
     connectSocket();
-    CreateThread(NULL, 0, sendThread, this, 0, NULL);
+
+    // Create a thread to send messages to the server.
+    HANDLE sendThreadHandle = CreateThread(NULL, 0, sendThread, this, 0, NULL);
+
+    // Wait for the send thread to finish & then close it.
+    WaitForSingleObject(sendThreadHandle, INFINITE);
+    CloseHandle(sendThreadHandle);
 }
 
 void Client::shutdown()

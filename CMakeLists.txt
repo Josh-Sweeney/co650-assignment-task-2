@@ -4,16 +4,23 @@ set(CMAKE_CXX_STANDARD 17)
 project(Program)
 
 add_subdirectory(shared)
+add_subdirectory(server)
+add_subdirectory(client)
 
-option(BUILD_SERVER "Build server" ON)
-option(BUILD_CLIENT "Build client" OFF)
+target_compile_definitions(Shared PRIVATE COMPILE_SERVER)
+target_compile_definitions(Shared PRIVATE COMPILE_CLIENT)
 
-if (BUILD_SERVER AND !BUILD_CLIENT)
-    add_subdirectory(server)
+# add_subdirectory(shared)
 
-    target_compile_definitions(Shared PRIVATE COMPILE_SERVER)
-elseif(BUILD_CLIENT AND !BUILD_SERVER)
-    add_subdirectory(client)
+# option(BUILD_SERVER "Build server" ON)
+# option(BUILD_CLIENT "Build client" OFF)
 
-    target_compile_definitions(Shared PRIVATE COMPILE_CLIENT)
-endif()
+# if (BUILD_SERVER AND !BUILD_CLIENT)
+#     add_subdirectory(server)
+
+#     target_compile_definitions(Shared PRIVATE COMPILE_SERVER)
+# elseif(BUILD_CLIENT AND !BUILD_SERVER)
+#     add_subdirectory(client)
+
+#     target_compile_definitions(Shared PRIVATE COMPILE_CLIENT)
+# endif()

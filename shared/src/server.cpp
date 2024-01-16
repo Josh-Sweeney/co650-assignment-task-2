@@ -96,7 +96,7 @@ void Server::listenSocket()
     std::cout << "Server: Now listening. Waiting for connections..." << std::endl;
 }
 
-void Server::initialize()
+void Server::run()
 {
     Comms::initializeWinsock();
     Comms::createSocket(this->serverSocket);
@@ -104,7 +104,13 @@ void Server::initialize()
     bindSocket();
     listenSocket();
 
-    CreateThread(NULL, 0, Server::acceptThread, (LPVOID)this, 0, NULL);
+    // Create a thread to accept connections.
+    // This thread will then create a new thread for each connection.
+    HANDLE acceptThread = CreateThread(NULL, 0, Server::acceptThread, (LPVOID)this, 0, NULL);
+
+    // Wait for the accept thread to finish & then close it.
+    WaitForSingleObject(acceptThread, INFINITE);
+    CloseHandle(acceptThread);
 }
 
 void Server::shutdown()
