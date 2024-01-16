@@ -25,7 +25,8 @@ DWORD WINAPI Client::sendThread(LPVOID param)
 
             if (byteCount == SOCKET_ERROR)
             {
-                throw std::runtime_error("Client: send() error " + WSAGetLastError());
+                std::string errorMessage = "Client: send() error " + std::to_string(WSAGetLastError());
+                throw std::runtime_error(errorMessage);
             }
 
             std::cout << "Client: send() is OK." << std::endl;
@@ -35,7 +36,8 @@ DWORD WINAPI Client::sendThread(LPVOID param)
             byteCount = recv(instance->clientSocket, responseBuffer, sizeof(responseBuffer), 0);
             if (byteCount < 0)
             {
-                throw std::runtime_error("Client: recv() error " + WSAGetLastError());
+                std::string errorMessage = "Client: recv() error " + std::to_string(WSAGetLastError());
+                throw std::runtime_error(errorMessage);
             }
 
             std::cout << "Server responded with message: " << responseBuffer << std::endl;
@@ -52,7 +54,8 @@ void Client::connectSocket()
 {
     if (connect(this->clientSocket, (SOCKADDR *)&this->clientService, sizeof(this->clientService)) == SOCKET_ERROR)
     {
-        throw std::runtime_error("Client: connect() error " + WSAGetLastError());
+        std::string errorMessage = "Client: connect() error " + std::to_string(WSAGetLastError());
+        throw std::runtime_error(errorMessage);
     }
 
     std::cout << "Connected to socket." << std::endl;

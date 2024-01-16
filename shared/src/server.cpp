@@ -24,7 +24,8 @@ DWORD WINAPI Server::acceptThread(LPVOID param)
             instance->acceptSocket = accept(instance->serverSocket, (SOCKADDR *)&from, &fromLength);
             if (instance->acceptSocket == INVALID_SOCKET)
             {
-                throw std::runtime_error("Server: Accept failed: " + WSAGetLastError());
+                std::string errorMessage = "Server: Accept failed: " + std::to_string(WSAGetLastError());
+                throw std::runtime_error(errorMessage);
             }
 
             int getNameResult = getnameinfo((SOCKADDR *)&from, fromLength, hostString, NI_MAXHOST, serverString, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
@@ -64,7 +65,8 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
             int byteCount = recv(instance->acceptSocket, receiveBuffer, 200, 0);
             if (byteCount < 0)
             {
-                throw std::runtime_error("Server: recv() error " + WSAGetLastError());
+                std::string errorMessage = "Server: recv() error " + std::to_string(WSAGetLastError());
+                throw std::runtime_error(errorMessage);
             }
 
             std::cout << "Server: Received message: " << receiveBuffer << std::endl;
@@ -90,7 +92,8 @@ void Server::bindSocket()
 {
     if (bind(this->serverSocket, (SOCKADDR *)&this->serverService, sizeof(this->serverService)) == SOCKET_ERROR)
     {
-        throw std::runtime_error("Server: Binding failed: " + WSAGetLastError());
+        std::string errorMessage = "Server: Binding failed: " + std::to_string(WSAGetLastError());
+        throw std::runtime_error(errorMessage);
     }
 
     std::cout << "Server: Binding was successful" << std::endl;
@@ -100,7 +103,8 @@ void Server::listenSocket()
 {
     if (listen(this->serverSocket, 1) == SOCKET_ERROR)
     {
-        throw std::runtime_error("Server: Listening failed: " + WSAGetLastError());
+        std::string errorMessage = "Server: Listening failed: " + std::to_string(WSAGetLastError());
+        throw std::runtime_error(errorMessage);
     }
 
     std::cout << "Server: Now listening. Waiting for connections..." << std::endl;
