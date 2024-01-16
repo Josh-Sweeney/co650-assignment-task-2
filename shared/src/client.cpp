@@ -17,7 +17,7 @@ DWORD WINAPI Client::sendThread(LPVOID param)
             std::cin.getline(buffer, 200);
             int byteCount = send(instance->clientSocket, buffer, 200, 0);
 
-            if (strstr("SHUTDOWN", buffer))
+            if (strstr("QUIT", buffer))
             {
                 std::cout << "Client: Shutting down client..." << std::endl;
                 break;

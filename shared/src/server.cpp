@@ -59,7 +59,7 @@ DWORD WINAPI Server::receiveThread(LPVOID param)
 
             std::cout << "Server: Received message: " << receiveBuffer << std::endl;
 
-            if (strstr("SHUTDOWN", receiveBuffer))
+            if (strstr("QUIT", receiveBuffer))
             {
                 instance->shutdown();
                 break;
